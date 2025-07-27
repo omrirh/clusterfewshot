@@ -1,0 +1,40 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+.idea
+
+# mac
+.DS_Store
+
+# Other
+.vscode
+*.tsv
+*.pt
+gpt*.txt
+*.env
+local/
+local_*
+build/
+*.egg-info/
+# *.jsonl
+# *.json
+!/data/*.json
+/dist/
+# **/*.pkl
+checklist.md
+finetuning_ckpts/
+# cache/
+* copy*
+.idea
+assertion.log
+*.log
+*.db
+/.devcontainer/.personalization.sh
+
+.mypy_cache
+dummy.csv
+docs/docs/**/*.json*
+*.index
+*.pkl
+*.tar.gz
