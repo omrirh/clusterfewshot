@@ -1,6 +1,6 @@
 # ClusterFewshot: BetterTogether Experiment Guide
 
-This guide provides reproducible steps to run BetterTogether experiments with a focus on evaluating and showcasing the capabilities of **ClusterFewshot**, a newly proposed diversity and feedback-driven prompt optimizer built on top of the [DSPy](https://github.com/stanfordnlp/dspy) framework. ClusterFewshot is designed to improve demonstration selection through semantic clustering and scoring-driven selection mechanisms, and integrates seamlessly within hybrid optimization pipelines introduced in [BetterTogether (2024)](https://arxiv.org/abs/2407.10930). The guide also supports comparison against other DSPy-based optimizers and serves as the official documentation for reproducing results in the accompanying paper.
+This guide provides reproducible steps to run BetterTogether experiments with a focus on evaluating and showcasing the capabilities of [**ClusterFewshot**](https://github.com/omrirh/dspy/blob/cluster-few-shot/dspy/teleprompt/cluster_fewshot.py), a newly proposed diversity and feedback-driven prompt optimizer built on top of the [DSPy](https://github.com/stanfordnlp/dspy) framework. ClusterFewshot is designed to improve demonstration selection through semantic clustering and scoring-driven selection mechanisms, and integrates seamlessly within hybrid optimization pipelines introduced in [BetterTogether (2024)](https://arxiv.org/abs/2407.10930). The guide also supports comparison against other DSPy-based optimizers and serves as the official documentation for reproducing results in the accompanying paper.
 
 > ✅ Validated on:
 >
@@ -58,15 +58,13 @@ bash better_together_experiment_driver.sh \
   --prompt-optimizer clusterfs
 ```
 
----
-
 ## Supported Configuration Options
 
 ### Prompt Optimizers (`--prompt-optimizer`)
 
-* `bfrs` — BootstrapFewshotRS (baseline, random search implementation for BootstrapFewshot optimizer)
-* `clusterfs` — ClusterFewshot (Semantic-aware with task-adaptive sampling strategy bootstrap few-shot optimizer)
-* `miprov2` — MIPROv2 (jointly optimizes instructions and few-shot examples using bootstrapping and Bayesian Optimization)
+* `bfrs` — BootstrapFewshotRS (baseline, random search implementation on top of BootstrapFewshot optimizer) → [Source Code](https://github.com/omrirh/dspy/blob/cluster-few-shot/dspy/teleprompt/random_search.py)
+* `clusterfs` — ClusterFewshot (Semantic-aware with task-adaptive sampling strategy bootstrap few-shot optimizer) → [Source Code](https://github.com/omrirh/dspy/blob/cluster-few-shot/dspy/teleprompt/cluster_fewshot.py)
+* `miprov2` — MIPROv2 (jointly optimizes instructions and few-shot examples using bootstrapping and Bayesian Optimization) → [Source Code](https://github.com/omrirh/dspy/blob/cluster-few-shot/dspy/teleprompt/mipro_optimizer_v2.py)
 
 ### Experiment Strategies (`--strategy`)
 
@@ -127,5 +125,5 @@ For ClusterFewshot prompt optimizer, visualizations of Training/Validation PCA c
 
 This setup builds on the hybrid optimization strategy introduced by Stanford NLP:
 
-**Better Together: Combining Weight and Prompt Optimization for Instruction Tuning**
-[https://arxiv.org/abs/2407.10930](https://arxiv.org/abs/2407.10930)
+[**Fine-Tuning and Prompt Optimization: Two Great Steps that Work Better Together**](https://arxiv.org/abs/2407.10930)
+
