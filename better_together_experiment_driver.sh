@@ -1,8 +1,8 @@
 #!/bin/bash
 
 # Enable session variables and env
-source ../vm_vars.env
-source ../dspy_venv/bin/activate
+source vm_vars.env
+source dspy_venv/bin/activate
 
 # Default values
 DATASET="gsm8k"

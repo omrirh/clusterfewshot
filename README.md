@@ -18,7 +18,7 @@ This guide provides reproducible steps to run BetterTogether experiments with a 
 
 ```bash
 git clone https://github.com/omrirh/clusterfewshot.git
-cd clusterfewshot
+cd ClusterFewshot
 ```
 
 ### 2. Set up environment variables
