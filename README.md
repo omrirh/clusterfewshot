@@ -63,7 +63,7 @@ bash better_together_experiment_driver.sh \
 ### Prompt Optimizers (`--prompt-optimizer`)
 
 * `bfrs` — BootstrapFewshotRS (baseline, random search implementation on top of BootstrapFewshot optimizer) → [Source Code](https://github.com/omrirh/dspy/blob/cluster-few-shot/dspy/teleprompt/random_search.py)
-* `clusterfs` — ClusterFewshot (Semantic-aware with task-adaptive sampling strategy bootstrap few-shot optimizer) → [Source Code](https://github.com/omrirh/dspy/blob/cluster-few-shot/dspy/teleprompt/cluster_fewshot.py)
+* `clusterfs` — ClusterFewshot (Semantic-aware few-shot optimizer that combines bootstrapping with task-adaptive sampling strategies) → [Source Code](https://github.com/omrirh/dspy/blob/cluster-few-shot/dspy/teleprompt/cluster_fewshot.py)
 * `miprov2` — MIPROv2 (jointly optimizes instructions and few-shot examples using bootstrapping and Bayesian Optimization) → [Source Code](https://github.com/omrirh/dspy/blob/cluster-few-shot/dspy/teleprompt/mipro_optimizer_v2.py)
 
 ### Experiment Strategies (`--strategy`)
@@ -86,6 +86,9 @@ bash better_together_experiment_driver.sh \
 * `Qwen/Qwen3-8B`
 * `google/gemma-3-4b-it`
 * `Qwen/Qwen2-7B-Instruct`
+
+**Note: Ensure that your Hugging Face token has access to the selected model above.**
+
 
 ### Datasets (`--dataset`)
 
@@ -117,7 +120,7 @@ Each log file includes:
 * LoRA fine-tuning summaries (if applicable)
 * Final accuracy and configuration snapshot
 
-For ClusterFewshot prompt optimizer, visualizations of Training/Validation PCA clusters as well as EAD scores and distribution are stored in the local repository path.
+For ClusterFewshot prompt optimizer, visualizations of Training/Validation PCA clusters as well as One-shot scores and distribution are stored in the local repository path.
 
 ---
 
