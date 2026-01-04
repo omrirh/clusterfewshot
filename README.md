@@ -65,7 +65,7 @@ bash better_together_experiment_driver.sh \
 
 * `bfrs` - BootstrapFewshotRS (baseline, random search implementation on top of BootstrapFewshot optimizer)
 * `miprov2` - MIPROv2 (baseline, jointly optimizes instructions and bootstrapped few-shot examples using Bayesian Optimization)
-* * `clusterfs` - ClusterFewshot (Semantic-aware few-shot optimizer that combines bootstrapping with task-adaptive sampling strategies)
+* `clusterfs` - ClusterFewshot (Semantic-aware few-shot optimizer that combines bootstrapping with task-adaptive sampling strategies)
 
 ### Experiment Strategies (`--strategy`)
 
