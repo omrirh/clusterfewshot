@@ -8,7 +8,7 @@ source dspy_venv/bin/activate
 DATASET="gsm8k"
 PROMPT_OPTIMIZER="clusterfs"
 STRATEGY="p"
-MODEL="Qwen/Qwen2.5-7B-Instruct"
+MODEL="meta-llama/Meta-Llama-3-8B-Instruct"
 
 # Supported values
 VALID_DATASETS=("hotpotqa" "gsm8k" "iris")
@@ -20,9 +20,14 @@ VALID_MODELS=(
   "mistralai/Mistral-7B-Instruct-v0.2"
   "Qwen/Qwen2.5-7B-Instruct"
   "deepseek-ai/DeepSeek-R1-Distill-Qwen-7B"
+  "gemini/gemini-2.5-flash"
+  "gemini/gemini-2.5-pro"
   "Qwen/Qwen3-8B"
   "google/gemma-3-4b-it"
   "Qwen/Qwen2-7B-Instruct"
+  "meta-llama/Llama-3.1-8B-Instruct"
+  "meta-llama/Llama-3.2-3B-Instruct"
+  "openai/gpt-oss-20b"
 )
 
 # Parse arguments

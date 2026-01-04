@@ -1,54 +1,55 @@
-# ClusterFewshot: BetterTogether Experiment Guide
+# ClusterFewshot: Experimental Guide
 
-This guide provides reproducible steps to run BetterTogether experiments with a focus on evaluating and showcasing the capabilities of [**ClusterFewshot**](https://github.com/omrirh/dspy/blob/cluster-few-shot/dspy/teleprompt/cluster_fewshot.py), a newly proposed diversity and feedback-driven prompt optimizer built on top of the [DSPy](https://github.com/stanfordnlp/dspy) framework. ClusterFewshot is designed to improve demonstration selection through semantic clustering and scoring-driven selection mechanisms, and integrates seamlessly within hybrid optimization pipelines introduced in [BetterTogether (2024)](https://arxiv.org/abs/2407.10930). The guide also supports comparison against other DSPy-based optimizers and serves as the official documentation for reproducing results in the accompanying paper.
+This guide provides reproducible steps to run BetterTogether experiments with a focus on evaluating and showcasing the capabilities of **ClusterFewshot**, a newly proposed diversity and feedback-driven prompt optimizer built on top of the [DSPy](https://github.com/stanfordnlp/dspy) framework. ClusterFewshot is designed to improve demonstration selection through semantic clustering and scoring-driven selection mechanisms, and integrates seamlessly within hybrid optimization pipelines introduced in [BetterTogether (2024)](https://arxiv.org/abs/2407.10930). The guide also supports comparison against other bootstrap-based optimizers and serves as the official documentation for reproducing results in the accompanying paper.
 
 > ✅ Validated on:
->
 > * Ubuntu 20.04 / 22.04
 > * NVIDIA-compatible GPUs (driver version: **nvidia-driver-560** recommended):
->
 >   * 1 × L4 minimum (Prompt Optimization Only)
 >   * 1 × A100 80GB minimum (Prompt Optimization + LoRA Fine-tuning)
-> * DSPy 2.6.10
 ---
 
 ## Setup Instructions
 
-### 1. Clone the ClusterFewshot repository
+[//]: # (### 1. Clone the ClusterFewshot repository)
 
-```bash
-git clone https://github.com/omrirh/clusterfewshot.git
-cd ClusterFewshot
-```
+[//]: # ()
+[//]: # (```bash)
 
-### 2. Set up environment variables
+[//]: # (git clone https://github.com/omrirh/clusterfewshot.git)
+
+[//]: # (cd ClusterFewshot)
+
+[//]: # (```)
+
+### 1. Set up environment variables
 
 ```bash
 cp remote_setup/vm_vars.env.template vm_vars.env
 vi vm_vars.env  # Add your HuggingFace token
 ```
 
-### 3. (Optional) Install NVIDIA GPU drivers
+### 2. (Optional) Install NVIDIA GPU drivers
 
 ```bash
 bash remote_setup/install_nvidia_drivers.sh
 nvidia-smi  # validate NVIDIA GPU driver is installed
 ```
 
-### 4. Prepare virtual environment with all dependencies
+### 3. Prepare virtual environment with all dependencies
 
 ```bash
 bash remote_setup/prepare_virtualenv.sh
 ```
 
-### 5. Launch an SGLang-compatible local model in a separate shell (example: Qwen2.5)
+### 4. Launch an SGLang-compatible local model in a separate shell (example: Qwen2.5)
 
 ```bash
 bash remote_setup/run_sglang_model.sh --model-name Qwen/Qwen2.5-7B-Instruct
-# Wait for the model to fully load before proceeding to Step 6
+# Wait for the model to fully load before proceeding to Step 5
 ```
 
-### 6. Run the BetterTogether experiment
+### 5. Run the BetterTogether experiment
 
 ```bash
 bash better_together_experiment_driver.sh \
@@ -62,9 +63,9 @@ bash better_together_experiment_driver.sh \
 
 ### Prompt Optimizers (`--prompt-optimizer`)
 
-* `bfrs` — BootstrapFewshotRS (baseline, random search implementation on top of BootstrapFewshot optimizer) → [Source Code](https://github.com/omrirh/dspy/blob/cluster-few-shot/dspy/teleprompt/random_search.py)
-* `clusterfs` — ClusterFewshot (Semantic-aware few-shot optimizer that combines bootstrapping with task-adaptive sampling strategies) → [Source Code](https://github.com/omrirh/dspy/blob/cluster-few-shot/dspy/teleprompt/cluster_fewshot.py)
-* `miprov2` — MIPROv2 (jointly optimizes instructions and few-shot examples using bootstrapping and Bayesian Optimization) → [Source Code](https://github.com/omrirh/dspy/blob/cluster-few-shot/dspy/teleprompt/mipro_optimizer_v2.py)
+* `bfrs` - BootstrapFewshotRS (baseline, random search implementation on top of BootstrapFewshot optimizer)
+* `miprov2` - MIPROv2 (baseline, jointly optimizes instructions and bootstrapped few-shot examples using Bayesian Optimization)
+* * `clusterfs` - ClusterFewshot (Semantic-aware few-shot optimizer that combines bootstrapping with task-adaptive sampling strategies)
 
 ### Experiment Strategies (`--strategy`)
 
@@ -86,34 +87,22 @@ bash better_together_experiment_driver.sh \
 * `Qwen/Qwen3-8B`
 * `google/gemma-3-4b-it`
 * `Qwen/Qwen2-7B-Instruct`
+* `meta-llama/Llama-3.1-8B-Instruct`
+* `meta-llama/Llama-3.2-3B-Instruct`
 
 **Note: Ensure that your Hugging Face token has access to the selected model above.**
 
 
 ### Datasets (`--dataset`)
-
 * `gsm8k`
 * `hotpotqa`
 * `iris`
 
 ---
 
-## Hyperparameter Alignment
-
-This setup adheres to the original BetterTogether component hyperparameters as described in the [BetterTogether paper](https://arxiv.org/abs/2407.10930), including:
-
-* LoRA configuration (rank, alpha, dropout)
-* Learning rate and batch sizes
-* Number of prompt optimization rounds
-* Demo and candidate limits for BFRS
-* Evaluation settings and optimizer behavior
-
----
-
 ## Output and Logs
 
-Experiment logs and outputs are stored under the local repository. Existing BetterTogether experiment logs can be found under the `bt_experiments_logs` path.
-
+Experiment logs and outputs are stored under the local repository.
 Each log file includes:
 
 * Prompt optimization metrics and trace outputs
@@ -121,12 +110,4 @@ Each log file includes:
 * Final accuracy and configuration snapshot
 
 For ClusterFewshot prompt optimizer, visualizations of Training/Validation PCA clusters as well as One-shot scores and distribution are stored in the local repository path.
-
----
-
-## 🔗 Reference
-
-This setup builds on the hybrid optimization strategy introduced by Stanford NLP:
-
-[**Fine-Tuning and Prompt Optimization: Two Great Steps that Work Better Together**](https://arxiv.org/abs/2407.10930)
 

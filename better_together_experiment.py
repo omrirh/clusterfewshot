@@ -59,14 +59,19 @@ def main(dataset, prompt_optimizer, strategy, model):
         trainset = [x.with_inputs('question') for x in dataset.train][:train_size]
         testset = [x.with_inputs('question') for x in dataset.test][:test_size]
 
-    # Setup client with LM
-    sglang_port = 7501
-    sglang_url = f"http://localhost:{sglang_port}/v1"
-    lm = assign_local_lm(
-        model=model,
-        api_base=sglang_url,
-        provider=HFProvider(validation_set=devset, validation_metric=metric)
-    )
+    if model in dspy.clients.huggingface._HF_MODELS:
+        sglang_port = 7501
+        sglang_url = f"http://localhost:{sglang_port}/v1"
+        lm = assign_local_lm(
+            model=model,
+            api_base=sglang_url,
+            provider=HFProvider(validation_set=devset, validation_metric=metric)
+        )
+    else:  # Currently supports Gemini via API
+        import os
+
+        lm = dspy.LM(model, api_key=os.getenv("GEMINI_API_KEY"))
+        dspy.configure(lm=lm)
 
     # Set up the metric and evaluation tool
     evaluate_test = Evaluate(
@@ -77,8 +82,8 @@ def main(dataset, prompt_optimizer, strategy, model):
         display_table=False
     )
 
-    # Retriever model as ColBERTv2
-    COLBERT_V2_ENDPOINT = "http://20.102.90.50:2017/wiki17_abstracts"
+    # Retriever model as local ColBERTv2
+    COLBERT_V2_ENDPOINT = "http://localhost:8894/api/search"
     retriever = dspy.ColBERTv2(url=COLBERT_V2_ENDPOINT)
     dspy.configure(rm=retriever)
 
@@ -113,7 +118,7 @@ def main(dataset, prompt_optimizer, strategy, model):
     if prompt_optimizer_name == "miprov2":
         prompt_optimizer = MIPROv2(
             metric=metric,
-            auto="light",
+            auto="medium",
         )
 
     better_together = BetterTogether(
@@ -124,6 +129,7 @@ def main(dataset, prompt_optimizer, strategy, model):
     )
 
     # Run the BetterTogether optimization
+    start_time = time.time()
     with dspy.context(lm=lm, rm=retriever):
         optimized_program = better_together.compile(
             student=student,
@@ -131,6 +137,9 @@ def main(dataset, prompt_optimizer, strategy, model):
             strategy=strategy,
             valset_ratio=0.1
         )
+
+    end_time = time.time()
+    runtime = end_time - start_time
 
     experiment_header = f"[BetterTogether x {dataset_name} x {model} x {strategy} x {prompt_optimizer_name.upper()}]"
 
@@ -144,7 +153,8 @@ def main(dataset, prompt_optimizer, strategy, model):
     # Evaluate accuracy and output the results
     print(f"{experiment_header}\nCalculating experiment program results...")
     accuracy_test = evaluate_test(optimized_program)
-    print(f"\nScore:\t{accuracy_test}")
+    print(f"\nScore:\t{accuracy_test}\n"
+          f"Runtime:\t{runtime:.2f}")
 
 
 if __name__ == "__main__":

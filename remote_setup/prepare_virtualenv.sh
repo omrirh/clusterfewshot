@@ -23,7 +23,6 @@ uv pip install --upgrade pip
 uv pip install torch==2.6.0+cu124 torchvision==0.21.0+cu124  --extra-index-url https://download.pytorch.org/whl/cu124
 
 # Install DSPy main dev branch and other required Python packages
-pip install -e git+https://github.com/omrirh/dspy.git@cluster-few-shot#egg=dspy
 uv pip install -r remote_setup/requirements.txt
 
 # PATCH: support datasets==2.21.0 (for HotPotQA)
