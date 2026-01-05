@@ -29,8 +29,6 @@ class EvaluateEntropy(Evaluate):
         total_entropy = 0.0
         for example, prediction, success in results:
             if hasattr(prediction, 'logits'):
-                # TODO: nope, need to attach logprobs to prediction instance. see:
-                #  https://github.com/omrirh/dspy/blob/281bf2e77c1910a70b9b8f63642cb4ab159f2f17/dspy/clients/lm.py#L129
                 probs = softmax(prediction.logits)
                 pred_entropy = entropy(probs, base=2)
 

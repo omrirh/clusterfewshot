@@ -11,16 +11,16 @@ This guide provides reproducible steps to run BetterTogether experiments with a 
 
 ## Setup Instructions
 
-[//]: # (### 1. Clone the ClusterFewshot repository)
+[//]:
 
-[//]: # ()
-[//]: # (```bash)
+[//]:
+[//]:
 
-[//]: # (git clone https://github.com/omrirh/clusterfewshot.git)
+[//]:
 
-[//]: # (cd ClusterFewshot)
+[//]:
 
-[//]: # (```)
+[//]:
 
 ### 1. Set up environment variables
 
