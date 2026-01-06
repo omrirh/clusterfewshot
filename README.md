@@ -11,17 +11,6 @@ This guide provides reproducible steps to run BetterTogether experiments with a 
 
 ## Setup Instructions
 
-[//]:
-
-[//]:
-[//]:
-
-[//]:
-
-[//]:
-
-[//]:
-
 ### 1. Set up environment variables
 
 ```bash
