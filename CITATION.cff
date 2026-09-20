@@ -1,0 +1,28 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+title: "ClusterFewshot: Improving Few-shot Optimization for LLMs workflow"
+authors:
+  - family-names: "Bar Haim"
+    given-names: "Omri"
+    affiliation: "Tel Aviv University"
+  - family-names: "Katz"
+    given-names: "Shahar"
+    affiliation: "Tel Aviv University"
+  - family-names: "Wolf"
+    given-names: "Lior"
+    affiliation: "Tel Aviv University"
+date-released: 2026
+url: "https://github.com/omrirh/clusterfewshot"
+preferred-citation:
+  type: article
+  title: "ClusterFewshot: Improving Few-shot Optimization for LLMs workflow"
+  authors:
+    - family-names: "Bar Haim"
+      given-names: "Omri"
+    - family-names: "Katz"
+      given-names: "Shahar"
+    - family-names: "Wolf"
+      given-names: "Lior"
+  year: 2026
+  # TODO: fill in once the arxiv preprint is posted
+  url: "TBD"

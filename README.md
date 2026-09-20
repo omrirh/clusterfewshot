@@ -1,102 +1,97 @@
-# ClusterFewshot: Experimental Guide
+# ClusterFewshot
 
-This guide provides reproducible steps to run BetterTogether experiments with a focus on evaluating and showcasing the capabilities of **ClusterFewshot**, a newly proposed diversity and feedback-driven prompt optimizer built on top of the [DSPy](https://github.com/stanfordnlp/dspy) framework. ClusterFewshot is designed to improve demonstration selection through semantic clustering and scoring-driven selection mechanisms, and integrates seamlessly within hybrid optimization pipelines introduced in [BetterTogether (2024)](https://arxiv.org/abs/2407.10930). The guide also supports comparison against other bootstrap-based optimizers and serves as the official documentation for reproducing results in the accompanying paper.
+Semantic-clustering-based few-shot demonstration selection for [DSPy](https://github.com/stanfordnlp/dspy).
 
-> ✅ Validated on:
-> * Ubuntu 20.04 / 22.04
-> * NVIDIA-compatible GPUs (driver version: **nvidia-driver-560** recommended):
->   * 1 × L4 minimum (Prompt Optimization Only)
->   * 1 × A100 80GB minimum (Prompt Optimization + LoRA Fine-tuning)
----
+Most few-shot optimizers pick demonstrations by random search or metric-based ranking, overlooking the semantic structure of the task. ClusterFewshot clusters training and validation examples in a shared embedding space, scores each candidate demonstration by its empirical effect as a one-shot example, then selects the demonstration set that performs best on the validation set. This substantially reduces optimization cost while consistently improving accuracy relative to prior bootstrap-based methods, in both standalone prompt tuning and hybrid prompt-weight optimization (see the paper below).
 
-## Setup Instructions
-
-### 1. Set up environment variables
+## Install
 
 ```bash
-cp remote_setup/vm_vars.env.template vm_vars.env
-vi vm_vars.env  # Add your HuggingFace token
+pip install -e .
 ```
 
-### 2. (Optional) Install NVIDIA GPU drivers
+Requires Python >= 3.10 and depends on `dspy`, `scikit-learn`, `sentence-transformers`, and `datasets`.
 
-```bash
-bash remote_setup/install_nvidia_drivers.sh
-nvidia-smi  # validate NVIDIA GPU driver is installed
+## Quickstart
+
+```python
+import dspy
+from dspy.datasets.gsm8k import GSM8K, gsm8k_metric
+from clusterfewshot import ClusterFewshot, create_sentence_transformer_encoder
+
+dspy.configure(lm=dspy.LM("openai/gpt-4o-mini"))
+
+
+class CoT(dspy.Module):
+    def __init__(self):
+        super().__init__()
+        self.predict = dspy.ChainOfThought("question -> answer")
+
+    def forward(self, question):
+        return self.predict(question=question)
+
+
+dataset = GSM8K()
+
+optimizer = ClusterFewshot(
+    task_type="arithmetic",
+    metric=gsm8k_metric,
+    semantic_encoders=[create_sentence_transformer_encoder("all-mpnet-base-v2")],
+)
+
+optimized = optimizer.compile(student=CoT(), trainset=dataset.train, valset=dataset.dev)
 ```
 
-### 3. Prepare virtual environment with all dependencies
+Runnable versions: [`examples/quickstart_gsm8k.py`](examples/quickstart_gsm8k.py) (hosted API model) and [`examples/quickstart_gsm8k_local.py`](examples/quickstart_gsm8k_local.py) (any OpenAI-compatible local server, e.g. SGLang or vLLM).
 
-```bash
-bash remote_setup/prepare_virtualenv.sh
+## How it works
+
+1. Clusters training and validation examples in a shared semantic embedding space (K selected via silhouette score).
+2. Ranks each training example by its empirical effect as a one-shot demonstration, evaluated against a compact cluster-representative subset of the validation set.
+3. Assembles a few-shot set from a few candidate sampling strategies (e.g. globally top-ranked vs. best-per-cluster) and keeps whichever performs best on the validation set.
+
+## Bring-Your-Own-Encoder (BYOE)
+
+`ClusterFewshot` takes one or more `SemanticEncoder` instances and grid-searches over them, keeping whichever produces the best clustering (highest silhouette score). A `SemanticEncoder` wraps two things:
+
+- `semantics_extract`: picks the signal to embed out of a single `dspy.Example` (e.g. `ex.question`, or a numeric feature vector). Extraction only, no embedding happens here.
+- `encoder`: turns the extracted signal into a vector, a local model, a `dspy.Embedder` instance, or `None` for numeric passthrough.
+
+```python
+from clusterfewshot import (
+    create_sentence_transformer_encoder,  # local SentenceTransformer model
+    create_hosted_encoder,                # hosted litellm embedding model, e.g. "openai/text-embedding-3-small"
+    create_numeric_encoder,               # identity encoder for already-numeric inputs (e.g. Iris)
+)
+
+# Default extraction joins all input field values as text
+encoder = create_sentence_transformer_encoder("all-mpnet-base-v2")
+
+# Custom extraction for tasks with more than one relevant input field
+encoder = create_sentence_transformer_encoder(
+    "all-mpnet-base-v2",
+    semantics_extract=lambda ex: f"{ex.question} {ex.some_other_field}",
+)
+
+# No local model download required
+encoder = create_hosted_encoder("openai/text-embedding-3-small")
 ```
 
-### 4. Launch an SGLang-compatible local model in a separate shell (example: Qwen2.5)
+## When to use it
 
-```bash
-bash remote_setup/run_sglang_model.sh --model-name Qwen/Qwen2.5-7B-Instruct
-# Wait for the model to fully load before proceeding to Step 5
+- vs. **BootstrapFewShotWithRandomSearch**: structured demonstration selection instead of random search.
+- vs. **MIPROv2**: demonstration selection only, with a fixed and predictable call budget, instead of a joint instruction + demonstration search.
+- vs. **GEPA**: complementary, GEPA optimizes instructions with no few-shot examples; ClusterFewshot is the cheap way to do the demonstration half.
+
+## Citation
+
+```bibtex
+@article{barhaim2026clusterfewshot,
+  title   = {ClusterFewshot: Improving Few-shot Optimization for LLMs workflow},
+  author  = {Bar Haim, Omri and Katz, Shahar and Wolf, Lior},
+  year    = {2026},
+  note    = {Preprint}
+}
 ```
 
-### 5. Run the BetterTogether experiment
-
-```bash
-bash better_together_experiment_driver.sh \
-  --model Qwen/Qwen2.5-7B-Instruct \
-  --dataset iris \
-  --strategy "p -> w" \
-  --prompt-optimizer clusterfs
-```
-
-## Supported Configuration Options
-
-### Prompt Optimizers (`--prompt-optimizer`)
-
-* `bfrs` - BootstrapFewshotRS (baseline, random search implementation on top of BootstrapFewshot optimizer)
-* `miprov2` - MIPROv2 (baseline, jointly optimizes instructions and bootstrapped few-shot examples using Bayesian Optimization)
-* `clusterfs` - ClusterFewshot (Semantic-aware few-shot optimizer that combines bootstrapping with task-adaptive sampling strategies)
-
-### Experiment Strategies (`--strategy`)
-
-* `p` — Prompt only
-* `w` — Weight tuning only
-* `p -> w`
-* `w -> p`
-* `p -> w -> p`
-* `p -> p`
-* `p -> p -> p`
-
-### Base Models (`--model`)
-
-* `meta-llama/Llama-2-7b-chat-hf`
-* `meta-llama/Meta-Llama-3-8B-Instruct`
-* `mistralai/Mistral-7B-Instruct-v0.2`
-* `Qwen/Qwen2.5-7B-Instruct`
-* `deepseek-ai/DeepSeek-R1-Distill-Qwen-7B`
-* `Qwen/Qwen3-8B`
-* `google/gemma-3-4b-it`
-* `Qwen/Qwen2-7B-Instruct`
-* `meta-llama/Llama-3.1-8B-Instruct`
-* `meta-llama/Llama-3.2-3B-Instruct`
-
-**Note: Ensure that your Hugging Face token has access to the selected model above.**
-
-
-### Datasets (`--dataset`)
-* `gsm8k`
-* `hotpotqa`
-* `iris`
-
----
-
-## Output and Logs
-
-Experiment logs and outputs are stored under the local repository.
-Each log file includes:
-
-* Prompt optimization metrics and trace outputs
-* LoRA fine-tuning summaries (if applicable)
-* Final accuracy and configuration snapshot
-
-For ClusterFewshot prompt optimizer, visualizations of Training/Validation PCA clusters as well as One-shot scores and distribution are stored in the local repository path.
-
+Paper link: TBD (arxiv link pending).
