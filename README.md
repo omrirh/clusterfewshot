@@ -1,8 +1,8 @@
 # ClusterFewshot
 
-Semantic-clustering-based few-shot demonstration selection for [DSPy](https://github.com/stanfordnlp/dspy).
+Semantic-aware few-shot demonstration selection for [DSPy](https://github.com/stanfordnlp/dspy) workflows.
 
-Most few-shot optimizers pick demonstrations by random search or metric-based ranking, overlooking the semantic structure of the task. ClusterFewshot clusters training and validation examples in a shared embedding space, scores each candidate demonstration by its empirical effect as a one-shot example, then selects the demonstration set that performs best on the validation set. This substantially reduces optimization cost while consistently improving accuracy relative to prior bootstrap-based methods, in both standalone prompt tuning and hybrid prompt-weight optimization (see the paper below).
+Most few-shot optimizers pick demonstrations rely on random search or metric-based ranking, overlooking the semantic structure of the task. ClusterFewshot clusters training and validation examples in a shared embedding space, scores each candidate demonstration by its empirical effect as a one-shot example, then selects the demonstration set that performs best on the validation set. This substantially reduces optimization cost while consistently improving accuracy relative to prior bootstrap-based methods, in both standalone prompt tuning and hybrid prompt-weight optimization.
 
 ## Install
 
@@ -42,7 +42,7 @@ optimizer = ClusterFewshot(
 optimized = optimizer.compile(student=CoT(), trainset=dataset.train, valset=dataset.dev)
 ```
 
-Runnable versions: [`examples/quickstart_gsm8k.py`](examples/quickstart_gsm8k.py) (hosted API model) and [`examples/quickstart_gsm8k_local.py`](examples/quickstart_gsm8k_local.py) (any OpenAI-compatible local server, e.g. SGLang or vLLM).
+Runnable quickstarts: [`examples/quickstart_gsm8k.py`](examples/quickstart_gsm8k.py) (hosted API model) and [`examples/quickstart_gsm8k_local.py`](examples/quickstart_gsm8k_local.py) (any OpenAI-compatible local server, e.g. SGLang or vLLM).
 
 ## How it works
 
@@ -54,7 +54,7 @@ Runnable versions: [`examples/quickstart_gsm8k.py`](examples/quickstart_gsm8k.py
 
 `ClusterFewshot` takes one or more `SemanticEncoder` instances and grid-searches over them, keeping whichever produces the best clustering (highest silhouette score). A `SemanticEncoder` wraps two things:
 
-- `semantics_extract`: picks the signal to embed out of a single `dspy.Example` (e.g. `ex.question`, or a numeric feature vector). Extraction only, no embedding happens here.
+- `semantics_extract`: picks the signal to embed out of a single `dspy.Example` (e.g. `ex.question`, or a numeric feature vector).
 - `encoder`: turns the extracted signal into a vector, a local model, a `dspy.Embedder` instance, or `None` for numeric passthrough.
 
 ```python
@@ -79,9 +79,9 @@ encoder = create_hosted_encoder("openai/text-embedding-3-small")
 
 ## When to use it
 
-- vs. **BootstrapFewShotWithRandomSearch**: structured demonstration selection instead of random search.
-- vs. **MIPROv2**: demonstration selection only, with a fixed and predictable call budget, instead of a joint instruction + demonstration search.
-- vs. **GEPA**: complementary, GEPA optimizes instructions with no few-shot examples; ClusterFewshot is the cheap way to do the demonstration half.
+- vs. **BootstrapFewShotWithRandomSearch**: Structured demonstration selection instead of random search.
+- vs. **MIPROv2**: Demonstration selection only, with a fixed and predictable call budget, instead of a joint instruction + demonstration search.
+- vs. **GEPA**: Complementary, GEPA optimizes instructions with no few-shot examples; ClusterFewshot is the cheap way to do the demonstration half.
 
 ## Citation
 
@@ -93,5 +93,3 @@ encoder = create_hosted_encoder("openai/text-embedding-3-small")
   note    = {Preprint}
 }
 ```
-
-Paper link: TBD (arxiv link pending).
