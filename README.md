@@ -86,10 +86,13 @@ encoder = create_hosted_encoder("openai/text-embedding-3-small")
 ## Citation
 
 ```bibtex
-@article{barhaim2026clusterfewshot,
-  title   = {ClusterFewshot: Improving Few-shot Optimization for LLMs workflow},
-  author  = {Bar Haim, Omri and Katz, Shahar and Wolf, Lior},
-  year    = {2026},
-  note    = {Preprint}
+@inproceedings{barhaim2027clusterfewshot,
+  title         = {{ClusterFewshot}: Improving Few-shot Optimization for {LLMs} workflow},
+  author        = {Bar Haim, Omri and Katz, Shahar and Wolf, Lior},
+  booktitle     = {Findings of the Association for Computational Linguistics: EACL 2027},
+  year          = {2027},
+  publisher     = {Association for Computational Linguistics},
+  eprint        = {2609.25939},
+  archivePrefix = {arXiv}
 }
 ```

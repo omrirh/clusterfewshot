@@ -11,11 +11,14 @@ authors:
   - family-names: "Wolf"
     given-names: "Lior"
     affiliation: "Tel Aviv University"
-date-released: 2026
+date-released: 2026-09-20
 url: "https://github.com/omrirh/clusterfewshot"
 preferred-citation:
-  type: article
+  type: conference-paper
   title: "ClusterFewshot: Improving Few-shot Optimization for LLMs workflow"
+  collection-title: "Findings of the Association for Computational Linguistics: EACL 2027"
+  publisher:
+    name: "Association for Computational Linguistics"
   authors:
     - family-names: "Bar Haim"
       given-names: "Omri"
@@ -23,6 +26,9 @@ preferred-citation:
       given-names: "Shahar"
     - family-names: "Wolf"
       given-names: "Lior"
-  year: 2026
-  # TODO: fill in once the arxiv preprint is posted
-  url: "TBD"
+  year: 2027
+  identifiers:
+    - type: other
+      value: "arXiv:2609.25939"
+      description: "arXiv preprint"
+  url: "https://arxiv.org/abs/2609.25939"
